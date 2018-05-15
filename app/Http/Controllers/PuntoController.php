@@ -12,9 +12,10 @@ class PuntoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $punto=Punto::Buscar();
+    public function index($id)
+    { 
+        $puntos=Punto::Buscar();
+        $punto = explode(" ", $puntos[$id]);
 
         return view('puntoVista',compact('punto'));
     }

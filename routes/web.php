@@ -15,6 +15,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
-Route::get('/punto','PuntoController@index');
+Route::get('/punto/{id}','PuntoController@index');
 

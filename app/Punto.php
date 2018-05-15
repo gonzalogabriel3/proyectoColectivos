@@ -17,9 +17,7 @@ class Punto extends Model
         /*Quito el 'LineString' y los '{()}' devuelto en la consulta, para que unicamente queden los puntos*/
         $puntos[0]=substr($puntos[0],23);
         $puntos[count($puntos)-1]=substr($puntos[count($puntos)-1],0,-4);
-              
-        $punto = explode(" ", $puntos[5]);
         
-        return $punto;
+        return $puntos;
     }
 }
