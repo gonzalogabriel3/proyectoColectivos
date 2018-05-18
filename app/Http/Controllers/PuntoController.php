@@ -25,6 +25,15 @@ class PuntoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function ruta(){
+        
+        $puntos=Punto::Buscar();
+        
+        return view('rutaVista',compact('puntos'));
+       
+    }
+
+
     public function create()
     {
         //

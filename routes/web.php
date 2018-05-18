@@ -17,3 +17,4 @@ Route::get('/', function () {
 
 Route::get('/punto/{id}','PuntoController@index');
 
+Route::get('/ruta','PuntoController@ruta');

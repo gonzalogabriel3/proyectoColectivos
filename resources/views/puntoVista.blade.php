@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+  <title>Mapa</title>
     <style>
        #map {
         height: 400px;
@@ -12,7 +13,7 @@
     <h3>My Google Maps Demo</h3>
     <div id="map"></div>
     <script>
-      function initMap() {
+      function initMap() {       
         var uluru = {lat: {{ $punto[1] }} , lng: {{ $punto[0]}} };
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 17,

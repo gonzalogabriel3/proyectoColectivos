@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 class Punto extends Model
 {
-    protected $table="ejemploruta";
+    protected $table="recorrido_playa_vuelta";
 
     public function scopeBuscar(){
 
-        $recorrido = DB::table('ejemploruta')->select(DB::raw(' ST_AsText(ST_LineMerge(geom)) as puntos'))->get();
+        $recorrido = DB::table('recorrido_playa_vuelta')->select(DB::raw(' ST_AsText(ST_LineMerge(geom)) as puntos'))->get();
         
         $puntos = explode(",", $recorrido);
         /*Quito el 'LineString' y los '{()}' devuelto en la consulta, para que unicamente queden los puntos*/
