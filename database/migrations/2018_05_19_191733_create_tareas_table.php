@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRecorridoPlayaVueltaTable extends Migration
+class CreateTareasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,11 @@ class CreateRecorridoPlayaVueltaTable extends Migration
      */
     public function up()
     {
-        Schema::create('recorrido_playa_vuelta', function (Blueprint $table) {
-            $table->increments('gid');
-            $table->string('full_id');
-            $table->string('osm_id');
-            $table->string('osm_type');
+        Schema::create('tareas', function (Blueprint $table) {
+            $table->increments('id');
             $table->string('name');
-            $table->string('oneway');
-            //$table->geometry('geom');
+            $table->unsignedInteger('user_id');
+            $table->text('description');
             $table->timestamps();
         });
     }
@@ -32,6 +29,6 @@ class CreateRecorridoPlayaVueltaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('recorrido_playa_vuelta');
+        Schema::dropIfExists('tareas');
     }
 }

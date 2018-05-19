@@ -18,3 +18,8 @@ Route::get('/', function () {
 Route::get('/punto/{id}','PuntoController@index');
 
 Route::get('/ruta','PuntoController@ruta');
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Route::resource('/tarea', 'TareaController');
