@@ -1097,7 +1097,8 @@ window.Vue = __webpack_require__(36);
  */
 
 Vue.component('example-component', __webpack_require__(39));
-Vue.component('tarea', __webpack_require__(42));
+
+Vue.component('task', __webpack_require__(42));
 
 var app = new Vue({
   el: '#app'
@@ -43322,7 +43323,7 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "resources\\assets\\js\\components\\tarea.vue"
+Component.options.__file = "resources\\assets\\js\\components\\Task.vue"
 
 /* hot reload */
 if (false) {(function () {
@@ -43331,9 +43332,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-86ba5c8c", Component.options)
+    hotAPI.createRecord("data-v-7cde4e08", Component.options)
   } else {
-    hotAPI.reload("data-v-86ba5c8c", Component.options)
+    hotAPI.reload("data-v-7cde4e08", Component.options)
   }
   module.hot.dispose(function (data) {
     disposed = true
@@ -43437,20 +43438,55 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
-            tarea: {
+            task: {
                 name: '',
                 description: ''
             },
             errors: [],
-            tareas: []
+            tasks: [],
+            update_task: []
         };
     },
     mounted: function mounted() {
-        this.readtareas();
+        this.readTasks();
     },
 
     methods: {
@@ -43460,14 +43496,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         createTask: function createTask() {
             var _this = this;
 
-            axios.post('/tarea', {
-                name: this.tarea.name,
-                description: this.tarea.description
+            axios.post('/task', {
+                name: this.task.name,
+                description: this.task.description
             }).then(function (response) {
 
-                _this.reset();
+                //this.reset();
 
-                _this.tareas.push(response.data.tarea);
+                //this.task.push(response.data.task);
 
                 $("#add_task_model").modal("hide");
             }).catch(function (error) {
@@ -43482,16 +43518,58 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         reset: function reset() {
-            this.tarea.name = '';
-            this.tarea.description = '';
+            this.task.name = '';
+            this.task.description = '';
         },
-        readtareas: function readtareas() {
+        resetUpdate: function resetUpdate() {
+            this.update_task.name = '';
+            this.update_task.description = '';
+        },
+        readTasks: function readTasks() {
             var _this2 = this;
 
-            axios.get('/tarea').then(function (response) {
+            axios.get('/task').then(function (response) {
 
-                _this2.tareas = response.data.tareas;
+                _this2.tasks = response.data.tasks;
             });
+        },
+        initUpdate: function initUpdate(id) {
+            this.errors = [];
+            this.resetUpdate();
+            $("#update_task_model").modal("show");
+            this.update_task = this.tasks[id];
+        },
+        updateTask: function updateTask() {
+            var _this3 = this;
+
+            axios.patch('/task/' + this.update_task.id, {
+                name: this.update_task.name,
+                description: this.update_task.description
+            }).then(function (response) {
+
+                $("#update_task_model").modal("hide");
+            }).catch(function (error) {
+                _this3.errors = [];
+                if (error.response.data.errors.name) {
+                    _this3.errors.push(error.response.data.errors.name[0]);
+                }
+
+                if (error.response.data.errors.description) {
+                    _this3.errors.push(error.response.data.errors.description[0]);
+                }
+            });
+        },
+        deleteTask: function deleteTask(id) {
+            var _this4 = this;
+
+            var conf = confirm("De verdad quiere borrar esta tarea?");
+            if (conf === true) {
+
+                axios.delete('/task/' + this.tasks[id].id).then(function (response) {
+
+                    _this4.tasks.splice(id, -1);
+                }).catch(function (error) {});
+            }
         }
     }
 });
@@ -43521,15 +43599,15 @@ var render = function() {
               },
               [
                 _vm._v(
-                  "\n                        + Añadir Nueva Tarea\n                    "
+                  "\n                        + Add New Task\n                    "
                 )
               ]
             ),
-            _vm._v("\n                    Mis tareas\n                ")
+            _vm._v("\n                    My Tasks\n                ")
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "panel-body" }, [
-            _vm.tareas.length > 0
+            _vm.tasks.length > 0
               ? _c(
                   "table",
                   {
@@ -43542,27 +43620,53 @@ var render = function() {
                       [
                         _vm._m(0),
                         _vm._v(" "),
-                        _vm._l(_vm.tareas, function(tarea) {
-                          return _c("tr", { key: tarea.id }, [
-                            _c("td", [_vm._v(_vm._s(_vm.index + 1))]),
+                        _vm._l(_vm.tasks, function(task) {
+                          return _c("tr", { key: task.id }, [
+                            _c("td", [_vm._v(_vm._s(task.id))]),
                             _vm._v(" "),
                             _c("td", [
                               _vm._v(
-                                "\n                                    " +
-                                  _vm._s(tarea.name) +
-                                  "\n                                "
+                                "\n                                " +
+                                  _vm._s(task.name) +
+                                  "\n                            "
                               )
                             ]),
                             _vm._v(" "),
                             _c("td", [
                               _vm._v(
-                                "\n                                    " +
-                                  _vm._s(tarea.description) +
-                                  "\n                                "
+                                "\n                                " +
+                                  _vm._s(task.description) +
+                                  "\n                            "
                               )
                             ]),
                             _vm._v(" "),
-                            _vm._m(1, true)
+                            _c("td", [
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-success btn-xs",
+                                  on: {
+                                    click: function($event) {
+                                      _vm.initUpdate(task.id)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Edit")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-danger btn-xs",
+                                  on: {
+                                    click: function($event) {
+                                      _vm.deleteTask(task.id)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Delete")]
+                              )
+                            ])
                           ])
                         })
                       ],
@@ -43588,7 +43692,7 @@ var render = function() {
           { staticClass: "modal-dialog", attrs: { role: "document" } },
           [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(2),
+              _vm._m(1),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _vm.errors.length > 0
@@ -43612,8 +43716,8 @@ var render = function() {
                       {
                         name: "model",
                         rawName: "v-model",
-                        value: _vm.tarea.name,
-                        expression: "tarea.name"
+                        value: _vm.task.name,
+                        expression: "task.name"
                       }
                     ],
                     staticClass: "form-control",
@@ -43623,13 +43727,13 @@ var render = function() {
                       id: "name",
                       placeholder: "Task Name"
                     },
-                    domProps: { value: _vm.tarea.name },
+                    domProps: { value: _vm.task.name },
                     on: {
                       input: function($event) {
                         if ($event.target.composing) {
                           return
                         }
-                        _vm.$set(_vm.tarea, "name", $event.target.value)
+                        _vm.$set(_vm.task, "name", $event.target.value)
                       }
                     }
                   })
@@ -43645,8 +43749,8 @@ var render = function() {
                       {
                         name: "model",
                         rawName: "v-model",
-                        value: _vm.tarea.description,
-                        expression: "tarea.description"
+                        value: _vm.task.description,
+                        expression: "task.description"
                       }
                     ],
                     staticClass: "form-control",
@@ -43657,13 +43761,13 @@ var render = function() {
                       rows: "5",
                       placeholder: "Task Description"
                     },
-                    domProps: { value: _vm.tarea.description },
+                    domProps: { value: _vm.task.description },
                     on: {
                       input: function($event) {
                         if ($event.target.composing) {
                           return
                         }
-                        _vm.$set(_vm.tarea, "description", $event.target.value)
+                        _vm.$set(_vm.task, "description", $event.target.value)
                       }
                     }
                   })
@@ -43694,6 +43798,123 @@ var render = function() {
           ]
         )
       ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: { tabindex: "-1", role: "dialog", id: "update_task_model" }
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(2),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _vm.errors.length > 0
+                  ? _c("div", { staticClass: "alert alert-danger" }, [
+                      _c(
+                        "ul",
+                        _vm._l(_vm.errors, function(error) {
+                          return _c("li", { key: error.id }, [
+                            _vm._v(_vm._s(error))
+                          ])
+                        })
+                      )
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", [_vm._v("Name:")]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.update_task.name,
+                        expression: "update_task.name"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text", placeholder: "Task Name" },
+                    domProps: { value: _vm.update_task.name },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(_vm.update_task, "name", $event.target.value)
+                      }
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "description" } }, [
+                    _vm._v("Description:")
+                  ]),
+                  _vm._v(" "),
+                  _c("textarea", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.update_task.description,
+                        expression: "update_task.description"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      cols: "30",
+                      rows: "5",
+                      placeholder: "Task Description"
+                    },
+                    domProps: { value: _vm.update_task.description },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(
+                          _vm.update_task,
+                          "description",
+                          $event.target.value
+                        )
+                      }
+                    }
+                  })
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-default",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_vm._v("Close")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: { click: _vm.updateTask }
+                  },
+                  [_vm._v("Submit")]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
     )
   ])
 }
@@ -43705,37 +43926,27 @@ var staticRenderFns = [
     return _c("tr", [
       _c("th", [
         _vm._v(
-          "\n                                    No.\n                                "
+          "\n                                No.\n                            "
         )
       ]),
       _vm._v(" "),
       _c("th", [
         _vm._v(
-          "\n                                    Name\n                                "
+          "\n                                Name\n                            "
         )
       ]),
       _vm._v(" "),
       _c("th", [
         _vm._v(
-          "\n                                    Description\n                                "
+          "\n                                Description\n                            "
         )
       ]),
       _vm._v(" "),
       _c("th", [
         _vm._v(
-          "\n                                    Action\n                                "
+          "\n                                Action\n                            "
         )
       ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("button", { staticClass: "btn btn-success btn-xs" }, [_vm._v("Edit")]),
-      _vm._v(" "),
-      _c("button", { staticClass: "btn btn-danger btn-xs" }, [_vm._v("Delete")])
     ])
   },
   function() {
@@ -43758,6 +43969,27 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("h4", { staticClass: "modal-title" }, [_vm._v("Add New Task")])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      ),
+      _vm._v(" "),
+      _c("h4", { staticClass: "modal-title" }, [_vm._v("Update Task")])
+    ])
   }
 ]
 render._withStripped = true
@@ -43765,7 +43997,7 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-86ba5c8c", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-7cde4e08", module.exports)
   }
 }
 

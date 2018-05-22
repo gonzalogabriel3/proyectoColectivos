@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Task;
 use Illuminate\Http\Request;
 
-class TareaController extends Controller
+class TaskController extends Controller
 {
     public function __construct()
     {
@@ -17,10 +18,14 @@ class TareaController extends Controller
      */
     public function index()
     {
-        $tareas = Tarea::where(['user_id' => Auth::user()->id])->get();
+        //
+        $tasks = Task::all();
+        
+        
         return response()->json([
-            'tasks'    => $tareas,
+            'tasks'    => $tasks,
         ], 200);
+        
     }
 
     /**
@@ -45,13 +50,13 @@ class TareaController extends Controller
             'name'        => 'required|max:255',
             'description' => 'required',
         ]);
- 
-        $task = Tarea::create([
+
+        $task = Task::create([
             'name'        => request('name'),
             'description' => request('description'),
             'user_id'     => Auth::user()->id
         ]);
- 
+
         return response()->json([
             'task'    => $task,
             'message' => 'Success'
@@ -61,10 +66,10 @@ class TareaController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Task $task)
     {
         //
     }
@@ -72,10 +77,10 @@ class TareaController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Task $task)
     {
         //
     }
@@ -84,22 +89,38 @@ class TareaController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Task $task)
     {
         //
+        $this->validate($request, [
+            'name'        => 'required|max:255',
+            'description' => 'required',
+        ]);
+ 
+        $task->name = request('name');
+        $task->description = request('description');
+        $task->save();
+ 
+        return response()->json([
+            'message' => 'Task updated successfully!'
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Task $task)
     {
         //
+        $task->delete();
+        return response()->json([
+            'message' => 'Task deleted successfully!'
+        ], 200);
     }
 }
