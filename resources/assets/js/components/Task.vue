@@ -147,24 +147,26 @@
                 axios.post('/task', {
                     name: this.task.name,
                     description: this.task.description,
+                    
                 })
                     .then(response => {
-
-                        //this.reset();
-
-                        //this.task.push(response.data.task);
+                        
+                        this.readTasks();
+                        
+                        this.reset();
 
                         $("#add_task_model").modal("hide");
+
 
                     })
                     .catch(error => {
                         this.errors = [];
-                        if (error.response.data.errors.name) {
-                            this.errors.push(error.response.data.errors.name[0]);
+                        if (error.errors != undefined && error.errors.name != undefined) {
+                            this.errors.push(error.errors.name[0]);
                         }
 
-                        if (error.response.data.errors.description) {
-                            this.errors.push(error.response.data.errors.description[0]);
+                        if (error.errors != undefined && error.errors.description != undefined) {
+                            this.errors.push(error.errors.description[0]);
                         }
                     });
             },
@@ -207,25 +209,29 @@
                     })
                     .catch(error => {
                         this.errors = [];
-                        if (error.response.data.errors.name) {
-                            this.errors.push(error.response.data.errors.name[0]);
+                        if (error.errors != undefined && error.errors.name != undefined) {
+                            this.errors.push(error.errors.name[0]);
                         }
 
-                        if (error.response.data.errors.description) {
-                            this.errors.push(error.response.data.errors.description[0]);
+                        if (error.errors != undefined && error.errors.description != undefined) {
+                            this.errors.push(error.errors.description[0]);
                         }
                     });
             },
             deleteTask(id)
             {
                 let conf = confirm("De verdad quiere borrar esta tarea?");
-                if (conf === true) {
+                if (conf) {
 
-                    axios.delete('/task/' + this.tasks[id].id)
-                        .then(response => {
+                    axios({
+                        method:'delete',
+                        url:'/task/'+id
+                        })
+                        .then(
+                            response => {
+                                this.readTasks();
 
-                            this.tasks.splice(id, -1);
-
+                            
                         })
                         .catch(error => {
 

@@ -43499,21 +43499,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             axios.post('/task', {
                 name: this.task.name,
                 description: this.task.description
+
             }).then(function (response) {
 
-                //this.reset();
+                _this.readTasks();
 
-                //this.task.push(response.data.task);
+                _this.reset();
 
                 $("#add_task_model").modal("hide");
             }).catch(function (error) {
                 _this.errors = [];
-                if (error.response.data.errors.name) {
-                    _this.errors.push(error.response.data.errors.name[0]);
+                if (error.errors != undefined && error.errors.name != undefined) {
+                    _this.errors.push(error.errors.name[0]);
                 }
 
-                if (error.response.data.errors.description) {
-                    _this.errors.push(error.response.data.errors.description[0]);
+                if (error.errors != undefined && error.errors.description != undefined) {
+                    _this.errors.push(error.errors.description[0]);
                 }
             });
         },
@@ -43550,12 +43551,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 $("#update_task_model").modal("hide");
             }).catch(function (error) {
                 _this3.errors = [];
-                if (error.response.data.errors.name) {
-                    _this3.errors.push(error.response.data.errors.name[0]);
+                if (error.errors != undefined && error.errors.name != undefined) {
+                    _this3.errors.push(error.errors.name[0]);
                 }
 
-                if (error.response.data.errors.description) {
-                    _this3.errors.push(error.response.data.errors.description[0]);
+                if (error.errors != undefined && error.errors.description != undefined) {
+                    _this3.errors.push(error.errors.description[0]);
                 }
             });
         },
@@ -43563,11 +43564,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var _this4 = this;
 
             var conf = confirm("De verdad quiere borrar esta tarea?");
-            if (conf === true) {
+            if (conf) {
 
-                axios.delete('/task/' + this.tasks[id].id).then(function (response) {
-
-                    _this4.tasks.splice(id, -1);
+                axios({
+                    method: 'delete',
+                    url: '/task/' + id
+                }).then(function (response) {
+                    _this4.readTasks();
                 }).catch(function (error) {});
             }
         }
