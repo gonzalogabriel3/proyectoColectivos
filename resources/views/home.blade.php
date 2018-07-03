@@ -1,5 +1,5 @@
 @extends('layouts.app')
  
 @section('content')
-<colectivo></colectivo>
+<task></task>
 @endsection

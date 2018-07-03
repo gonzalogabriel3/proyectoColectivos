@@ -43473,6 +43473,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
@@ -43481,9 +43497,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 name: '',
                 description: ''
             },
+            nuevoPunto: {
+                latitud: '',
+                longitud: ''
+            },
             errors: [],
             tasks: [],
-            update_task: []
+            update_task: [],
+            puntos: [{
+                latitud: '-43.1231',
+                longitud: '-69.3211'
+            }]
         };
     },
     mounted: function mounted() {
@@ -43559,6 +43583,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     _this3.errors.push(error.response.data.errors.description[0]);
                 }
             });
+        },
+        crearPunto: function crearPunto() {
+            this.puntos.push(this.nuevoPunto);
+            this.nuevoPunto = { latitud: '', longitud: '' };
         },
         deleteTask: function deleteTask(id) {
             var _this4 = this;
@@ -43747,33 +43775,113 @@ var render = function() {
                     _vm._v("Description:")
                   ]),
                   _vm._v(" "),
-                  _c("textarea", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.task.description,
-                        expression: "task.description"
-                      }
+                  _c(
+                    "div",
+                    { attrs: { id: "Punto" } },
+                    [
+                      _c("label", { attrs: { for: "new-todo" } }, [
+                        _vm._v("Add a Punto")
+                      ]),
+                      _vm._v(" "),
+                      _vm._l(_vm.puntos, function(punto) {
+                        return _c("ul", [
+                          _c("li", [
+                            _vm._v(
+                              "\n                                    " +
+                                _vm._s(punto.id) +
+                                ": " +
+                                _vm._s(punto.latitud) +
+                                " // " +
+                                _vm._s(punto.longitud) +
+                                "\n                                "
+                            )
+                          ])
+                        ])
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "form",
+                        {
+                          staticClass: "form",
+                          on: {
+                            submit: function($event) {
+                              $event.preventDefault()
+                              return _vm.crearPunto($event)
+                            }
+                          }
+                        },
+                        [
+                          _c("label", { attrs: { for: "nuevo punto" } }, [
+                            _vm._v("Latitud")
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.nuevoPunto.latitud,
+                                expression: "nuevoPunto.latitud"
+                              }
+                            ],
+                            attrs: { type: "text", name: "latitud" },
+                            domProps: { value: _vm.nuevoPunto.latitud },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.nuevoPunto,
+                                  "latitud",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("label", { attrs: { for: "nuevo punto" } }, [
+                            _vm._v("Longitud")
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.nuevoPunto.longitud,
+                                expression: "nuevoPunto.longitud"
+                              }
+                            ],
+                            attrs: { type: "text", name: "longitud" },
+                            domProps: { value: _vm.nuevoPunto.longitud },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.nuevoPunto,
+                                  "longitud",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-primary",
+                              attrs: { type: "submit" }
+                            },
+                            [_vm._v("agregar punto")]
+                          )
+                        ]
+                      )
                     ],
-                    staticClass: "form-control",
-                    attrs: {
-                      name: "description",
-                      id: "description",
-                      cols: "30",
-                      rows: "5",
-                      placeholder: "Task Description"
-                    },
-                    domProps: { value: _vm.task.description },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(_vm.task, "description", $event.target.value)
-                      }
-                    }
-                  })
+                    2
+                  )
                 ])
               ]),
               _vm._v(" "),
