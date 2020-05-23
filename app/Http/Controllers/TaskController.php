@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Task;
+use DB;
+use App\Recorrido;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Phaza\LaravelPostgis\Geometries\LineString;
+use Phaza\LaravelPostgis\Geometries\Point;
 
 class TaskController extends Controller
 {
@@ -12,6 +14,7 @@ class TaskController extends Controller
     {
         $this->middleware('auth');
     }
+    
     /**
      * Display a listing of the resource.
      *
@@ -19,14 +22,30 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
-        $tasks = Task::all();
+        //Obtengo el recorrido(linestring)
+        $recorrido=Recorrido::find(1);
         
+        //Creo un array donde se va a contener todos los punto del linestring
+        $puntos=array();
         
+        foreach ($recorrido->geom as $geom) {
+            //Obtengo la latitud y longitud de un punto
+            $latitud=$geom->getLat();
+            $longitud=$geom->getLng();
+            
+            //Creo un nuevo arreglo y le inserto los valores de la latitud y longitud
+            $punto=array();
+            array_push($punto,$latitud);
+            array_push($punto,$longitud);
+
+            //Al arreglo creado,lo agrego al arreglo de puntos
+            array_push($puntos,$punto);
+        }
+       
+    
         return response()->json([
-            'tasks'    => $tasks,
+            'puntos' => $puntos
         ], 200);
-        
     }
 
     /**
@@ -47,42 +66,49 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name'        => 'required',
-            'description' => 'required',
-        ]);
-
-        $task = new Task;
-        $task->name = $request->name;
-        $task->description = $request->description;
-        $task->user_id = Auth::id();
-        $task->save();
-
-
-        return response()->json([
-            'task'    => $task,
-            'message' => 'Success'
-        ], 200);
+        //
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Task  $task
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Task $task)
+    public function show($id)
     {
-        //
+        //Obtengo el recorrido(linestring)
+        $recorrido=Recorrido::find($id);
+        
+        //Creo un array donde se va a contener todos los punto del linestring
+        $puntos=array();
+        
+        foreach ($recorrido->geom as $geom) {
+            //Obtengo la latitud y longitud de un punto
+            $latitud=$geom->getLat();
+            $longitud=$geom->getLng();
+            
+            //Creo un nuevo arreglo y le inserto los valores de la latitud y longitud
+            $punto=array();
+            array_push($punto,$latitud);
+            array_push($punto,$longitud);
+
+            //Al arreglo creado,lo agrego al arreglo de puntos
+            array_push($puntos,$punto);
+        }
+       
+        return response()->json([
+            'puntos' => $puntos
+        ], 200);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Task  $task
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Task $task)
+    public function edit($id)
     {
         //
     }
@@ -91,38 +117,22 @@ class TaskController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Task  $task
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Task $task)
+    public function update(Request $request, $id)
     {
         //
-        $this->validate($request, [
-            'name'        => 'required|max:255',
-            'description' => 'required',
-        ]);
- 
-        $task->name = $request->get('name');
-        $task->description = $request->get('description');
-        $task->save();
- 
-        return response()->json([
-            'message' => 'Task updated successfully!'
-        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Task  $task
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Task $task)
+    public function destroy($id)
     {
         //
-        $task->delete();
-        return response()->json([
-            'message' => 'Task deleted successfully!'
-        ], 200);
     }
 }

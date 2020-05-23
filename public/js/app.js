@@ -43387,220 +43387,83 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
-            task: {
-                name: '',
-                description: ''
-            },
-            nuevoPunto: {
-                latitud: '',
-                longitud: ''
-            },
-            errors: [],
-            tasks: [],
-            update_task: [],
-            puntos: [{
-                latitud: '-43.1231',
-                longitud: '-69.3211'
-            }]
+            modalRecorrido: false,
+            recorrido_identificador: '',
+            recorridos: [],
+            puntosRecorrido: null,
+            mapa: [] //Variable donde se va a contener el mapa principal
         };
     },
     mounted: function mounted() {
-        this.readTasks();
+        this.Leer();
+        this.mapa = this.GenerarMapa();
     },
 
     methods: {
-        initAddTask: function initAddTask() {
-            $("#add_task_model").modal("show");
+        GenerarMapa: function GenerarMapa() {
+            /*Genero el mapa*/
+            var mymap = L.map('mapid').setView([-43.2991348, -65.1056655], 13);
+
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' + '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' + 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox.streets',
+                updateWhenIdle: true,
+                reuseTiles: true
+
+            }).addTo(mymap);
+            return mymap;
         },
-        createTask: function createTask() {
+        BuscarRecorrido: function BuscarRecorrido(id) {
             var _this = this;
 
-            axios.post('/task', {
-                name: this.task.name,
-                description: this.task.description
+            //this.puntosRecorrido === null;
 
-            }).then(function (response) {
 
-                _this.readTasks();
-
-                _this.reset();
-
-                $("#add_task_model").modal("hide");
-            }).catch(function (error) {
-                _this.errors = [];
-                if (error.errors != undefined && error.errors.name != undefined) {
-                    _this.errors.push(error.errors.name[0]);
-                }
-
-                if (error.errors != undefined && error.errors.description != undefined) {
-                    _this.errors.push(error.errors.description[0]);
-                }
+            //Cargo los puntos del recorrido seleccionado
+            axios.get("/task/" + this.recorrido_identificador).then(function (response) {
+                _this.puntosRecorrido = response.data.puntos;
             });
+            //console.log(this.puntosRecorrido);
+
+            if (polyline === undefined) {
+                var polyline = L.polyline(this.puntosRecorrido, { color: 'red' }).addTo(this.mapa);
+            } else {
+                this.mapa.removeLayer(polyline); // For hide
+                var polyline = L.polyline(this.puntosRecorrido, { color: 'red' }).addTo(this.mapa);
+            }
+            this.closeModalRecorrido();
         },
-        reset: function reset() {
-            this.task.name = '';
-            this.task.description = '';
-        },
-        resetUpdate: function resetUpdate() {
-            this.update_task.name = '';
-            this.update_task.description = '';
-        },
-        readTasks: function readTasks() {
+        Leer: function Leer() {
             var _this2 = this;
 
-            axios.get('/task').then(function (response) {
-
-                _this2.tasks = response.data.tasks;
+            //Cargo recorridos
+            axios.get("/recorrido").then(function (response) {
+                _this2.recorridos = response.data.recorridos;
+            });
+            //Cargo un recorrido
+            axios.get("/task").then(function (response) {
+                _this2.puntosRecorrido = response.data.puntos;
             });
         },
-        initUpdate: function initUpdate(id) {
-            this.errors = [];
-            $("#update_task_model").modal("show");
-            this.update_task = this.tasks[id];
+        AgregarLineString: function AgregarLineString() {
+
+            // zoom the map to the polyline
+            //this.mapa.fitBounds(polyline.getBounds());
+
+            /*---- FIN DE LINESTRING ----*/
         },
-        updateTask: function updateTask() {
-            var _this3 = this;
 
-            axios.patch('/task/' + this.update_task.id, {
-                name: this.update_task.name,
-                description: this.update_task.description
-            }).then(function (response) {
-
-                $("#update_task_model").modal("hide");
-            }).catch(function (error) {
-                _this3.errors = [];
-                if (error.response.data.errors.name) {
-                    _this3.errors.push(error.response.data.errors.name[0]);
-                }
-
-                if (error.response.data.errors.description) {
-                    _this3.errors.push(error.response.data.errors.description[0]);
-                }
-            });
+        //MODALS funciones
+        showModalRecorrido: function showModalRecorrido() {
+            this.modalRecorrido = true;
         },
-        crearPunto: function crearPunto() {
-            this.puntos.push(this.nuevoPunto);
-            this.nuevoPunto = { latitud: '', longitud: '' };
-        },
-        deleteTask: function deleteTask(id) {
-            var _this4 = this;
-
-            var conf = confirm("De verdad quiere borrar esta tarea?");
-            if (conf) {
-
-                axios({
-                    method: 'delete',
-                    url: '/task/' + id
-                }).then(function (response) {
-                    _this4.readTasks();
-                }).catch(function (error) {});
-            }
+        closeModalRecorrido: function closeModalRecorrido() {
+            this.modalRecorrido = false;
         }
     }
 });
@@ -43613,496 +43476,129 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container" }, [
-    _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-md-12" }, [
-        _c("div", { staticClass: "panel panel-default" }, [
-          _c("div", { staticClass: "panel-heading" }, [
+  return _c("div", [
+    _c("div", {
+      staticStyle: { width: "600px", height: "400px" },
+      attrs: { id: "mapid" }
+    }),
+    _vm._v(" "),
+    _c(
+      "button",
+      { staticClass: "btn btn-success", on: { click: _vm.showModalRecorrido } },
+      [_vm._v("Mostrar un Recorrido")]
+    ),
+    _vm._v(" "),
+    _vm.modalRecorrido
+      ? _c(
+          "div",
+          {
+            staticClass: "modal show",
+            attrs: {
+              id: "anadir",
+              tabindex: "-1",
+              role: "dialog",
+              "aria-labelledby": "anadir"
+            }
+          },
+          [
             _c(
-              "button",
-              {
-                staticClass: "btn btn-primary btn-xs pull-right",
-                on: {
-                  click: function($event) {
-                    _vm.initAddTask()
-                  }
-                }
-              },
+              "div",
+              { staticClass: "modal-dialog", attrs: { role: "document" } },
               [
-                _vm._v(
-                  "\n                        + Add New Task\n                    "
-                )
-              ]
-            ),
-            _vm._v("\n                    My Tasks\n                ")
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "panel-body" }, [
-            _vm.tasks.length > 0
-              ? _c(
-                  "table",
-                  {
-                    staticClass:
-                      "table table-bordered table-striped table-responsive"
-                  },
-                  [
+                _c("div", { staticClass: "modal-content" }, [
+                  _c("div", { staticClass: "modal-header" }, [
                     _c(
-                      "tbody",
+                      "button",
+                      {
+                        staticClass: "close",
+                        attrs: { type: "button", "aria-label": "Close" },
+                        on: { click: _vm.closeModalRecorrido }
+                      },
                       [
-                        _vm._m(0),
+                        _c("span", { attrs: { "aria-hidden": "true" } }, [
+                          _vm._v("×")
+                        ])
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("h4", { staticClass: "modal-title" }, [
+                      _vm._v("Eliga un Recorrido")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.recorrido_identificador,
+                            expression: "recorrido_identificador"
+                          }
+                        ],
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.recorrido_identificador = $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          }
+                        }
+                      },
+                      [
+                        _c("option", { attrs: { disabled: "", value: "" } }, [
+                          _vm._v("--Seleccione un recorrido--")
+                        ]),
                         _vm._v(" "),
-                        _vm._l(_vm.tasks, function(task) {
-                          return _c("tr", { key: task.id }, [
-                            _c("td", [_vm._v(_vm._s(task.id))]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                "\n                                " +
-                                  _vm._s(task.name) +
-                                  "\n                            "
-                              )
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                "\n                                " +
-                                  _vm._s(task.description) +
-                                  "\n                            "
-                              )
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _c(
-                                "button",
-                                {
-                                  staticClass: "btn btn-success btn-xs",
-                                  on: {
-                                    click: function($event) {
-                                      _vm.initUpdate(task.id)
-                                    }
-                                  }
-                                },
-                                [_vm._v("Edit")]
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "button",
-                                {
-                                  staticClass: "btn btn-danger btn-xs",
-                                  on: {
-                                    click: function($event) {
-                                      _vm.deleteTask(task.id)
-                                    }
-                                  }
-                                },
-                                [_vm._v("Delete")]
-                              )
-                            ])
-                          ])
+                        _vm._l(_vm.recorridos, function(recorrido) {
+                          return _c(
+                            "option",
+                            {
+                              key: recorrido.id,
+                              domProps: { value: recorrido.id }
+                            },
+                            [_vm._v(_vm._s(recorrido.nombre))]
+                          )
                         })
                       ],
                       2
                     )
-                  ]
-                )
-              : _vm._e()
-          ])
-        ])
-      ])
-    ]),
-    _vm._v(" "),
-    _c(
-      "div",
-      {
-        staticClass: "modal fade",
-        attrs: { tabindex: "-1", role: "dialog", id: "add_task_model" }
-      },
-      [
-        _c(
-          "div",
-          { staticClass: "modal-dialog", attrs: { role: "document" } },
-          [
-            _c("div", { staticClass: "modal-content" }, [
-              _vm._m(1),
-              _vm._v(" "),
-              _c("div", { staticClass: "modal-body" }, [
-                _vm.errors.length > 0
-                  ? _c("div", { staticClass: "alert alert-danger" }, [
-                      _c(
-                        "ul",
-                        _vm._l(_vm.errors, function(error) {
-                          return _c("li", { key: error.id }, [
-                            _vm._v(_vm._s(error))
-                          ])
-                        })
-                      )
-                    ])
-                  : _vm._e(),
-                _vm._v(" "),
-                _c("div", { staticClass: "form-group" }, [
-                  _c("label", { attrs: { for: "name" } }, [_vm._v("Name:")]),
-                  _vm._v(" "),
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.task.name,
-                        expression: "task.name"
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: {
-                      type: "text",
-                      name: "name",
-                      id: "name",
-                      placeholder: "Task Name"
-                    },
-                    domProps: { value: _vm.task.name },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(_vm.task, "name", $event.target.value)
-                      }
-                    }
-                  })
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "form-group" }, [
-                  _c("label", { attrs: { for: "description" } }, [
-                    _vm._v("Description:")
                   ]),
                   _vm._v(" "),
-                  _c(
-                    "div",
-                    { attrs: { id: "Punto" } },
-                    [
-                      _c("label", { attrs: { for: "new-todo" } }, [
-                        _vm._v("Add a Punto")
-                      ]),
-                      _vm._v(" "),
-                      _vm._l(_vm.puntos, function(punto) {
-                        return _c("ul", [
-                          _c("li", [
-                            _vm._v(
-                              "\n                                    " +
-                                _vm._s(punto.id) +
-                                ": " +
-                                _vm._s(punto.latitud) +
-                                " // " +
-                                _vm._s(punto.longitud) +
-                                "\n                                "
-                            )
-                          ])
-                        ])
-                      }),
-                      _vm._v(" "),
-                      _c(
-                        "form",
-                        {
-                          staticClass: "form",
-                          on: {
-                            submit: function($event) {
-                              $event.preventDefault()
-                              return _vm.crearPunto($event)
-                            }
-                          }
-                        },
-                        [
-                          _c("label", { attrs: { for: "nuevo punto" } }, [
-                            _vm._v("Latitud")
-                          ]),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.nuevoPunto.latitud,
-                                expression: "nuevoPunto.latitud"
-                              }
-                            ],
-                            attrs: { type: "text", name: "latitud" },
-                            domProps: { value: _vm.nuevoPunto.latitud },
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _vm.recorrido_identificador
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-success",
                             on: {
-                              input: function($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.$set(
-                                  _vm.nuevoPunto,
-                                  "latitud",
-                                  $event.target.value
-                                )
+                              click: function($event) {
+                                _vm.BuscarRecorrido()
                               }
                             }
-                          }),
-                          _vm._v(" "),
-                          _c("label", { attrs: { for: "nuevo punto" } }, [
-                            _vm._v("Longitud")
-                          ]),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.nuevoPunto.longitud,
-                                expression: "nuevoPunto.longitud"
-                              }
-                            ],
-                            attrs: { type: "text", name: "longitud" },
-                            domProps: { value: _vm.nuevoPunto.longitud },
-                            on: {
-                              input: function($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.$set(
-                                  _vm.nuevoPunto,
-                                  "longitud",
-                                  $event.target.value
-                                )
-                              }
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c(
-                            "button",
-                            {
-                              staticClass: "btn btn-primary",
-                              attrs: { type: "submit" }
-                            },
-                            [_vm._v("agregar punto")]
-                          )
-                        ]
-                      )
-                    ],
-                    2
-                  )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "modal-footer" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-default",
-                    attrs: { type: "button", "data-dismiss": "modal" }
-                  },
-                  [_vm._v("Close")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary",
-                    attrs: { type: "button" },
-                    on: { click: _vm.createTask }
-                  },
-                  [_vm._v("Submit")]
-                )
-              ])
-            ])
-          ]
-        )
-      ]
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      {
-        staticClass: "modal fade",
-        attrs: { tabindex: "-1", role: "dialog", id: "update_task_model" }
-      },
-      [
-        _c(
-          "div",
-          { staticClass: "modal-dialog", attrs: { role: "document" } },
-          [
-            _c("div", { staticClass: "modal-content" }, [
-              _vm._m(2),
-              _vm._v(" "),
-              _c("div", { staticClass: "modal-body" }, [
-                _vm.errors.length > 0
-                  ? _c("div", { staticClass: "alert alert-danger" }, [
-                      _c(
-                        "ul",
-                        _vm._l(_vm.errors, function(error) {
-                          return _c("li", { key: error.id }, [
-                            _vm._v(_vm._s(error))
-                          ])
-                        })
-                      )
-                    ])
-                  : _vm._e(),
-                _vm._v(" "),
-                _c("div", { staticClass: "form-group" }, [
-                  _c("label", [_vm._v("Name:")]),
-                  _vm._v(" "),
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.update_task.name,
-                        expression: "update_task.name"
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: { type: "text", placeholder: "Task Name" },
-                    domProps: { value: _vm.update_task.name },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(_vm.update_task, "name", $event.target.value)
-                      }
-                    }
-                  })
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "form-group" }, [
-                  _c("label", { attrs: { for: "description" } }, [
-                    _vm._v("Description:")
-                  ]),
-                  _vm._v(" "),
-                  _c("textarea", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.update_task.description,
-                        expression: "update_task.description"
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: {
-                      cols: "30",
-                      rows: "5",
-                      placeholder: "Task Description"
-                    },
-                    domProps: { value: _vm.update_task.description },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(
-                          _vm.update_task,
-                          "description",
-                          $event.target.value
+                          },
+                          [_vm._v("Mostrar recorrido")]
                         )
-                      }
-                    }
-                  })
+                      : _vm._e()
+                  ])
                 ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "modal-footer" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-default",
-                    attrs: { type: "button", "data-dismiss": "modal" }
-                  },
-                  [_vm._v("Close")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary",
-                    attrs: { type: "button" },
-                    on: { click: _vm.updateTask }
-                  },
-                  [_vm._v("Submit")]
-                )
-              ])
-            ])
+              ]
+            )
           ]
         )
-      ]
-    )
+      : _vm._e()
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("tr", [
-      _c("th", [
-        _vm._v(
-          "\n                                No.\n                            "
-        )
-      ]),
-      _vm._v(" "),
-      _c("th", [
-        _vm._v(
-          "\n                                Name\n                            "
-        )
-      ]),
-      _vm._v(" "),
-      _c("th", [
-        _vm._v(
-          "\n                                Description\n                            "
-        )
-      ]),
-      _vm._v(" "),
-      _c("th", [
-        _vm._v(
-          "\n                                Action\n                            "
-        )
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-header" }, [
-      _c(
-        "button",
-        {
-          staticClass: "close",
-          attrs: {
-            type: "button",
-            "data-dismiss": "modal",
-            "aria-label": "Close"
-          }
-        },
-        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
-      ),
-      _vm._v(" "),
-      _c("h4", { staticClass: "modal-title" }, [_vm._v("Add New Task")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-header" }, [
-      _c(
-        "button",
-        {
-          staticClass: "close",
-          attrs: {
-            type: "button",
-            "data-dismiss": "modal",
-            "aria-label": "Close"
-          }
-        },
-        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
-      ),
-      _vm._v(" "),
-      _c("h4", { staticClass: "modal-title" }, [_vm._v("Update Task")])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {

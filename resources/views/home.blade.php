@@ -1,5 +1,5 @@
-@extends('layouts.app')
- 
-@section('content')
-<task></task>
+@extends("layouts.app")
+    @section("content")
+        <task></task>
+        
 @endsection

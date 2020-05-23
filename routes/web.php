@@ -26,3 +26,4 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('/task', 'TaskController');
 Route::resource('/colectivo', 'ColectivoController');
+Route::resource('/recorrido', 'RecorridoController');
